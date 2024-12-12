@@ -1,47 +1,38 @@
-#include<iostream>
-using namespace std ;
+#include <iostream>
+// #include <vector>
+using namespace std;
 
-bool CheckIsSortedOrRotated(int arr[] , int n)
-{
-    bool res = false ;
-    for(int i = 1 ; i < n ; i++)
+bool checkRotatedAndSorted(int arr[] ,int n) {
+    if (n < 2) 
     {
-        if(arr[i] >= arr[i-1])
-        {
-            res = true ;
-        }
+        return false; 
+    }
 
-        else
+    int count = 0; 
+    for (int i = 0; i < n; i++) 
+    {
+        if (arr[i] > arr[(i + 1) % n]) 
         {
-            res = false;
-            return res ;
-            
+            count++;
         }
     }
-    return res ;
+
+    return count == 1;
 }
 
-int main()
-{
-    int n ; 
-    cout << "Enter the size of an array : ";
-    cin>> n;
-    int arr[n] ;
-    cout << "Enter elements in an array : " ;
-    for(int i = 0 ; i < n ; i++)
-    {
-        cin >> arr[i] ;
+int main() {
+    int n;
+    cout << "Enter the Size of an array: ";
+    cin >> n;
+    int arr[n];
+    cout << "Enter elements in the array: ";
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
     }
-
-    bool check = CheckIsSortedOrRotated(arr , n);
-    if(check == 0)
-    {
-        cout << "No, The array is not sorted " << endl ;
-    }
-
-    else
-    {
-        cout << "The array is sorted " << endl;
-    }
-    return 0 ;
+    
+    bool res = checkRotatedAndSorted(arr , n);
+    
+    cout << res << " " << endl ;
+    
+    return 0;
 }
