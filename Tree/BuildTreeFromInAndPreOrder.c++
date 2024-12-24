@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
+int preidx = 0;
 
 class node 
 {
@@ -26,35 +27,29 @@ node* buildTree(node* root)
     }
 
     root = new node(data);
-
     root->left = buildTree(root->left);
     root->right = buildTree(root->right);
 
     return root;
 }
-vector<int> PostOrder(node* root, vector<int>& result) 
+void PreOrder(node* root, vector<int>& pre) 
 {
-    if (root != NULL) 
-    {
-        PostOrder(root->left, result);
-        PostOrder(root->right, result);
-        result.push_back(root->data);
-    }
-    return result;
-}
-vector<int> InOrder(node* root, vector<int>& result) {
     if (root != NULL) {
-        InOrder(root->left, result);
-        result.push_back(root->data);
-        InOrder(root->right, result);
+        pre.push_back(root->data);
+        PreOrder(root->left, pre);
+        PreOrder(root->right, pre);
     }
-    return result;
+}
+void Inorder(node* root, vector<int>& in) 
+{
+    if (root != NULL) {
+        Inorder(root->left, in);
+        in.push_back(root->data);
+        Inorder(root->right, in);
+    }
 }
 void LevelOrder(node* root) {
-    if (root == NULL) {
-        cout << "Tree is empty!" << endl;
-        return;
-    }
+    if (!root) return;
 
     queue<node*> q;
     q.push(root);
@@ -62,6 +57,7 @@ void LevelOrder(node* root) {
     while (!q.empty()) {
         node* curr = q.front();
         q.pop();
+
         cout << curr->data << " ";
         if (curr->left != NULL) {
             q.push(curr->left);
@@ -72,10 +68,10 @@ void LevelOrder(node* root) {
     }
     cout << endl;
 }
-void printingTraversal(node* root , vector<int>& post, vector<int>& in)
+void printingTraversal(node* root , vector<int>& pre, vector<int>& in)
 {
-    cout << "Printing PostOrder: ";
-    for (int i : post) 
+    cout << "Printing PreOrder: ";
+    for (int i : pre) 
     {
         cout << i << " ";
     }
@@ -88,16 +84,17 @@ void printingTraversal(node* root , vector<int>& post, vector<int>& in)
     }
     cout << endl;
 }
-
-node* ReConstructTree(vector<int>& post, vector<int>& in, int start, int end, int& postidx) {
+node* BuildTree(vector<int>& pre, vector<int>& in, int start, int end) 
+{
     if (start > end) {
         return NULL;
     }
 
-    node* root = new node(post[postidx]);
-    postidx--;
+  
+    node* root = new node(pre[preidx++]);
 
-    int index = -1;
+    
+    int index;
     for (int i = start; i <= end; i++) {
         if (in[i] == root->data) {
             index = i;
@@ -105,40 +102,36 @@ node* ReConstructTree(vector<int>& post, vector<int>& in, int start, int end, in
         }
     }
 
-    root->right = ReConstructTree(post, in, index + 1, end, postidx);
-    root->left = ReConstructTree(post, in, start, index - 1, postidx);
+    root->left = BuildTree(pre, in, start, index - 1);
+    root->right = BuildTree(pre, in, index + 1, end);
 
     return root;
 }
-void CreatingTree(node* root)
+void Getdata(node* root)
 {
+    vector<int> pre;
+    vector<int> in;
     cout << endl << "Example data is : 1 2 4 -1 -1 5 -1 -1 3 6 -1 -1 7 -1 -1 " << endl ;
     cout << "Enter data to build the tree (-1 for NULL): ";
     root = buildTree(root);
 
-    vector<int> postOrder;
-    vector<int> inOrder;
+    PreOrder(root, pre);
+    Inorder(root, in);
 
-    PostOrder(root, postOrder);
-    InOrder(root, inOrder);
+    cout << "Printing PreOrder and InOrder traversal " << endl ;
 
-    cout << "Printing PostOrder and InOrder traversal " << endl ;
+    printingTraversal(root , pre , in);
 
-    printingTraversal(root , postOrder , inOrder);
-
-    int postidx = postOrder.size() -1 ;
-
-    node* newRoot = ReConstructTree(postOrder, inOrder, 0, inOrder.size() - 1, postidx);
+   
+    node* newRoot = BuildTree(pre, in, 0, in.size() - 1);
 
     cout << endl << "After Reconstruction, the tree's LevelOrder Traversal is: ";
     LevelOrder(newRoot);
-
-   
 }
 
 int main() {
     node* root = NULL;
+    Getdata(root);
 
-    CreatingTree(root);
     return 0;
 }
